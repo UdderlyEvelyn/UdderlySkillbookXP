@@ -1,0 +1,49 @@
+VERSION = 1,
+
+option UdderlySkillbookXP.Multiplier = {
+	type = double,
+	default = 5.5,
+	min = 0.01,
+	max = 10,
+	page = UdderlySkillbookXP,
+	translation = UdderlySkillbookXP_Multiplier,
+}
+
+option UdderlySkillbookXP.NeedLight = {
+	type = boolean,
+	default = true,
+	page = UdderlySkillbookXP,
+	translation = UdderlySkillbookXP_NeedLight,
+}
+
+option UdderlySkillbookXP.ReadWhileWalking = {
+	type = boolean,
+	default = false,
+	page = UdderlySkillbookXP,
+	translation = UdderlySkillbookXP_ReadWhileWalking,
+}
+
+option UdderlySkillbookXP.WalkingMultiplier = {
+	type = double,
+	default = 0.5,
+	min = 0.01,
+	max = 10,
+	page = UdderlySkillbookXP,
+	translation = UdderlySkillbookXP_WalkingMultiplier,
+}
+
+option UdderlySkillbookXP.SittingMultiplier = {
+	type = double,
+	default = 1.0,
+	min = 0.01,
+	max = 10,
+	page = UdderlySkillbookXP,
+	translation = UdderlySkillbookXP_SittingMultiplier,
+}
+
+option UdderlySkillbookXP.SkillWhitelist = {
+	type = string,
+	default = Woodwork;Electricity;MetalWelding;Mechanics,
+	page = UdderlySkillbookXP,
+	translation = UdderlySkillbookXP_SkillWhitelist,
+}

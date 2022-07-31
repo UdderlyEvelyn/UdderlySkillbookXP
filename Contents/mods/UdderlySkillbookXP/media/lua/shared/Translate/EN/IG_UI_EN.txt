@@ -1,0 +1,4 @@
+IG_UI_EN = {
+IGUI_PlayerText_CantFocusWhileMoving = "I can't focus on this book while I'm moving..",
+IGUI_PlayerText_TooDark = "I can't see the words, it's too dark!",
+}
