@@ -1,9 +1,6 @@
 Sandbox_EN = {
 	Sandbox_UdderlySkillbookXP = "Udderly Skillbook XP",
 	
-	Sandbox_UdderlySkillbookXP_Multiplier = "XP Multiplier",
-	Sandbox_UdderlySkillbookXP_Multiplier_tooltip = "XP gain per page multiplier (before any others).",
-	
 	Sandbox_UdderlySkillbookXP_NeedLight = "Need Light To Read",
 	Sandbox_UdderlySkillbookXP_NeedLight_tooltip = "If checked, requires light to read.",
 	
@@ -17,5 +14,5 @@ Sandbox_EN = {
 	Sandbox_UdderlySkillbookXP_SittingMultiplier_tooltip = "Multiplier applied (on top of the regular one) when the user is sitting while reading .",	
 	
 	Sandbox_UdderlySkillbookXP_SkillWhitelist = "Skill Whitelist",
-	Sandbox_UdderlySkillbookXP_SkillWhitelist_tooltip = "List of semicolon-delimited skill names - internal names from the game, not the normal names. If blank, defaults to Carpentry/Electrical/Metalworking/Mechanics.",
+	Sandbox_UdderlySkillbookXP_SkillWhitelist_tooltip = "List of semicolon-delimited skill names with and equals and the multiplier for each skill (percentage of the XP for that tier that you can get from reading) - internal names from the game, not the normal names.",
 }

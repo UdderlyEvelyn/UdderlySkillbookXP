@@ -3,7 +3,7 @@ local original_new = ISReadABook.new
 
 UdderlySkillbookXP = {};
 
-local whitelistFallback = "Woodwork;Electricity;MetalWelding;Mechanics"
+local whitelistFallback = "Woodwork=1;Electricity=1;MetalWelding=1;Mechanics=1;Cooking=.5;Farming=.5;Doctor=.5;Tailoring=.5;Fishing=.5;Trapping=.5;PlantScavenging=.5;Maintenance=.5;Aiming=.1;Reloading=.1;Sprinting=.1;Sneaking=.1;Lightfooted=.1;Nimble=.1;Axe=.1;Long Blunt=.1;Short Blunt=.1;Long Blade=.1;Short Blade=.1;Spear=.1;Strength=.1;Fitness=.1"
 
 local function sufficientLight(player)
 	local leftItem = player:getSecondaryHandItem()
@@ -46,21 +46,17 @@ local function sufficientLight(player)
 	return false --nothing let them read, so return false.
 end
 
-local function getXpForLevel(level)
+local passiveXPLevelThresholds = { 1500.0, 3000.0, 6000.0, 9000.0, 18000.0, 30000.0, 60000.0, 90000.0, 120000.0, 150000.0 }
+local xpLevelThresholds = { 75.0, 150.0, 300.0, 750.0, 1500.0, 3000.0, 4500.0, 6000.0, 7500.0, 9000.0 }
+
+local function getXPForLevel(level, passive)
+    passive = passive or false
     if level ~= 10 then
-        local XPPerPage = 0
-        if level == 0 or level == 1 then
-            XPPerPage = 0.84
-        elseif level == 2 or level == 3 then
-            XPPerPage = 3.24
-        elseif level == 4 or level == 5 then
-            XPPerPage = 12.02
-        elseif level == 6 or level == 7 then
-            XPPerPage = 24.74
-        elseif level == 8 or level == 9 then
-            XPPerPage = 34.78
+        if not passive then
+            return xpLevelThresholds[level]
+        else
+            return passiveXPLevelThresholds[level]
         end
-        return XPPerPage
     end
     return 0
 end
@@ -77,68 +73,109 @@ local function split(s, sep)
 end
 
 function ISReadABook:update()
-    local skillBook = SkillBook[self.item:getSkillTrained()]
-    if skillBook then
-        local perk = skillBook.perk
-        local skillWhitelisted = false
-        for i,skill in ipairs(split(SandboxVars.UdderlySkillbookXP.SkillWhitelist or whitelistFallback, ";")) do
-            if tostring(perk) == skill then --if this isn't whitelisted
-                skillWhitelisted = true
-                break
-            end
-        end
-        local level = self.character:getPerkLevel(perk)
-        local prePagesRead = self.item:getAlreadyReadPages()
-        local u = SandboxVars.UdderlySkillbookXP.Multiplier
-        if not skillWhitelisted then
-            u = 0 --abort XP
-        end
-        local player = getPlayer()
-        if player:isPlayerMoving() then
-            if SandboxVars.UdderlySkillbookXP.ReadWhileWalking then
-                u = u * SandboxVars.UdderlySkillbookXP.WalkingMultiplier
-            else
+	print("USBXP: Enter Function")
+	local player = getPlayer()
+	if SandboxVars.UdderlySkillbookXP.NeedLight and not sufficientLight(player) then
+		self.character:Say(getText("IGUI_PlayerText_TooDark"))
+		self:forceStop()
+		return
+	elseif self.character:HasTrait("Illiterate") then
+		self.character:Say(getText("IGUI_PlayerText_IlliterateReadAttempt"))
+		self:forceStop()
+		return
+	else
+		print("USBXP: Not illiterate and has sufficient light, proceeding..")
+		local multiplier = 1
+		
+		if player:isPlayerMoving() then
+		    if SandboxVars.UdderlySkillbookXP.ReadWhileWalking then
+                multiplier = SandboxVars.UdderlySkillbookXP.WalkingMultiplier
+		    else
                 self.character:Say(getText("IGUI_PlayerText_CantFocusWhileMoving"));
                 self:forceStop()
-            end
-        end
-        if player:isSitOnGround() then
-            u = u * SandboxVars.UdderlySkillbookXP.SittingMultiplier
-        end
-        if SandboxVars.UdderlySkillbookXP.NeedLight and not sufficientLight(player) then
-            self.character:Say(getText("IGUI_PlayerText_TooDark"))
-            self:forceStop()
-        end
-
-        original_update(self)
-        if self.item:getMaxLevelTrained() < level + 1 then
-            if self.pageTimer >= 200 then            
-                self.pageTimer = 0;
-                local txtRandom = ZombRand(2);
-                if txtRandom == 0 then
-                    self.character:Say(getText("IGUI_PlayerText_KnowSkill"));
-                    self:forceStop()                    
-                else
-                    self.character:Say(getText("IGUI_PlayerText_BookObsolete"));
-                    self:forceStop()
-                end
-            end        
-        else       
-            local pagesRead = self.item:getAlreadyReadPages() - prePagesRead
-            if pagesRead > 0 and level ~= 10 then                   
-                self.character:getXp():AddXP(perk, getXpForLevel(level) * pagesRead * u);
-            end
-        end         
-    else
-        original_update(self)    
-    end
+		    end
+		end
+		if player:isSitOnGround() then
+		    multiplier = SandboxVars.UdderlySkillbookXP.SittingMultiplier
+		end
+		
+		original_update(self) --Only run original code if we meet light requirements and aren't illiterate.
+		
+		local skillBook = SkillBook[self.item:getSkillTrained()]
+		local skillWhitelisted = false
+		local perk = ""
+		if skillBook then --If it's a skillbook, process the info about what skill it trains.
+			perk = skillBook.perk
+			print("USBXP: Is a skillbook for \""..tostring(perk).."\"")
+			local tmpMultiplier = 0
+			for i,pair in ipairs(split(SandboxVars.UdderlySkillbookXP.SkillWhitelist or whitelistFallback, ";")) do
+			print("USBXP: Parsing pair from sandbox options \""..pair.."\"..")
+				local pairBits = split(pair, "=")
+				local skill = pairBits[1] or ""
+				tmpMultiplier = multiplier * tonumber(pairBits[2]) or 0
+				print("USBXP: Skill \""..skill.."\", Multiplier "..tmpMultiplier)
+				if tostring(perk) == skill and tmpMultiplier > 0 then --if this is whitelisted
+					skillWhitelisted = true
+					multiplier = tmpMultiplier
+					break
+				end
+			end
+		end
+		print("USBXP: Skill \""..tostring(perk).."\" Whitelisted: "..tostring(skillWhitelisted))
+		
+		
+		if not skillWhitelisted then --Abort if not whitelisted for XP, we do this here and not earlier because we want to interrupt reading for walking or light level.
+		    return
+		end
+		
+		print("USBXP: Skill is whitelisted, proceeding..")
+		local level = self.character:getPerkLevel(perk)
+		local maxLevelTrained = self.item:getMaxLevelTrained()
+		local minLevelTrained = maxLevelTrained - self.item:getNumLevelsTrained()
+		local nextLevel = level + 1
+		print("USBXP: Level "..level..", Max Trained: "..maxLevelTrained..", Min Trained: "..minLevelTrained..", Next Level "..nextLevel)
+		if nextLevel > maxLevelTrained then --If they passed the tier, stop them..
+			local phrases = { "IGUI_PlayerText_KnowSkill", "IGUI_PlayerText_BookObsolete" }
+			self.character:Say(getText(phrases[ZombRand(2)]));
+			self:forceStop()
+		elseif nextLevel < minLevelTrained then --If they are under the threshold for this tier, stop them..
+			local phrases = { "IGUI_PlayerText_NotReady", "IGUI_PlayerText_TooAdvanced" }
+			self.character:Say(getText(phrases[ZombRand(2)]));
+			self:forceStop()
+		else --They are on the proper tier, continue..
+			print("USBXP: Correct tier to receive XP..")
+			local passive = perk == Perks.Fitness or perk == Perks.Strength
+			local percentRead = self.item:getAlreadyReadPages() / self.item:getNumberOfPages()
+			if percentRead > 1 then
+				percentRead = 1
+			end
+			print("USBXP: Percent Read: "..(percentRead * 100).."%")
+			local targetLevel = self.item:getLvlSkillTrained() + (self.item:getNumLevelsTrained() * multiplier) - 1
+			print("USBXP: Target Level "..targetLevel)
+			local targetXP = 0.0
+			for i=1,targetLevel do
+				targetXP = targetXP + getXPForLevel(i, passive)
+			end
+			print("USBXP: Full Target XP: "..targetXP)
+			targetXP = targetXP * percentRead
+			print("USBXP: Target XP: "..targetXP)
+			local currentXP = self.character:getXp():getXP(perk)
+			print("USBXP: Current XP: "..currentXP)
+			local xpToAdd = math.ceil(targetXP - currentXP)
+			if percentRead == 1 then
+				xpToAdd = xpToAdd + 1
+			end
+			print("USBXP: XP To Add: "..xpToAdd)
+			self.character:getXp():AddXP(perk, xpToAdd);
+		end
+	end
+	print("USBXP: End Function")
 end
 
 function ISReadABook:new(character, item, time)
     -- check for existing saves.
     if SkillBook[item:getSkillTrained()] then
         local player = getPlayer()
-        -- if item:getMaxLevelTrained() - 2 > character:getPerkLevel(SkillBook[item:getSkillTrained()].perk) then
         -- check if character has been inited before.
         if not player:getModData()['udderly:read:'..item:getName()] then
             item:setAlreadyReadPages(0)

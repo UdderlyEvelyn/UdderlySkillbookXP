@@ -1,6 +1,31 @@
 version=1
 id=2838472336
 title=Udderly Skillbook XP
-description=Gain Xp from reading, configurable restriction to different skills and other settings - based on Sarah & Karim's skillbook XP mod (with permission! friends of mine actually <3) with added skill whitelist, requirement of light to read, and the removal of the ability to get XP while walking - all configurable.
+description=Gain XP from reading, configurable restriction to different skills and other settings - based on (though very very diffrent now) Sarah & Karim's Multiplayer Addons mod with permission (friends of mine actually <3) with added features!
+description=
+description=[list]
+description=[*]Configurable Skill Whitelist/Multipliers Per Skill
+description=[*]Optional requirement of light to read
+description=[*]Optional ability to get XP while walking (and configure a multiplier for the XP gain)
+description=[*]Optional multiplier for XP gained while sitting vs. standing.
+description=[/list]
+description=
+description=Default Skill Whitelist/Multipliers Configuration:
+description=[list]
+description=[*]100% (2 levels): Carpentry, Electrical, Mechanics, Metalworking
+description=[*]50% (1 level): Cooking, Farming, Doctor, Tailoring, Fishing, Trapping, Foraging, Maintenance
+description=[*]10% (20% of a level): Aiming, Reloading, Sprinting, Sneaking, Lightfooted, Nimble, Axe, Long Blunt, Short Blunt, Long Blade, Short Blade, Spear, Strength, Fitness
+description=[/list]
+description=
+description=Obviously you'd need book mods that add books for a given skill for those that aren't in the base game.
+description=
+description=Credits:
+description=Sarah & Karim for the original mod here:
+description=https://steamcommunity.com/sharedfiles/filedetails/?id=2739375743
+description=
+description=Narrnika for the light requiring mod here from which I borrowed the light level checking code:
+description=https://steamcommunity.com/sharedfiles/filedetails/?id=2237300246
+description=
+description=Sought permission for the latter, but they did not respond.
 tags=Build 41;Balance;Literature;Multiplayer;Realistic
 visibility=public

@@ -2,7 +2,7 @@ VERSION = 1,
 
 option UdderlySkillbookXP.Multiplier = {
 	type = double,
-	default = 5.5,
+	default = 1,
 	min = 0.01,
 	max = 10,
 	page = UdderlySkillbookXP,
@@ -43,7 +43,7 @@ option UdderlySkillbookXP.SittingMultiplier = {
 
 option UdderlySkillbookXP.SkillWhitelist = {
 	type = string,
-	default = Woodwork;Electricity;MetalWelding;Mechanics,
+	default = Woodwork=1;Electricity=1;MetalWelding=1;Mechanics=1;Cooking=.5;Farming=.5;Doctor=.5;Tailoring=.5;Fishing=.5;Trapping=.5;PlantScavenging=.5;Maintenance=.5;Aiming=.1;Reloading=.1;Sprinting=.1;Sneaking=.1;Lightfooted=.1;Nimble=.1;Axe=.1;Long Blunt=.1;Short Blunt=.1;Long Blade=.1;Short Blade=.1;Spear=.1;Strength=.1;Fitness=.1,
 	page = UdderlySkillbookXP,
 	translation = UdderlySkillbookXP_SkillWhitelist,
 }

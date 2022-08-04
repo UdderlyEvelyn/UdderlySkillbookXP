@@ -1,4 +1,7 @@
 IG_UI_EN = {
 IGUI_PlayerText_CantFocusWhileMoving = "I can't focus on this book while I'm moving..",
 IGUI_PlayerText_TooDark = "I can't see the words, it's too dark!",
+IGUI_PlayerText_NotReady = "I'm not ready for this book yet.",
+IGUI_PlayerText_TooAdvanced = "This volume is too advanced for me.",
+IGUI_PlayerText_IlliterateReadAttempt = "I can't make sense of any of this scribbling!",
 }
