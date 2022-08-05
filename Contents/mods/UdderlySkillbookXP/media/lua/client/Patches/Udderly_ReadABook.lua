@@ -3,7 +3,7 @@ local original_new = ISReadABook.new
 
 UdderlySkillbookXP = {};
 
-local whitelistFallback = "Woodwork=1;Electricity=1;MetalWelding=1;Mechanics=1;Cooking=.5;Farming=.5;Doctor=.5;Tailoring=.5;Fishing=.5;Trapping=.5;PlantScavenging=.5;Maintenance=.5;Aiming=.1;Reloading=.1;Sprinting=.1;Sneaking=.1;Lightfooted=.1;Nimble=.1;Axe=.1;Long Blunt=.1;Short Blunt=.1;Long Blade=.1;Short Blade=.1;Spear=.1;Strength=.1;Fitness=.1"
+local whitelistFallback = "Woodwork=1;Electricity=1;MetalWelding=1;Mechanics=1;Cooking=.5;Farming=.5;Doctor=.5;Tailoring=.5;Fishing=.5;Trapping=.5;PlantScavenging=.5;Maintenance=.5;Aiming=.1;Reloading=.1;S--printing=.1;Sneaking=.1;Lightfooted=.1;Nimble=.1;Axe=.1;Long Blunt=.1;Short Blunt=.1;Long Blade=.1;Short Blade=.1;Spear=.1;Strength=.1;Fitness=.1"
 
 local function sufficientLight(player)
 	local leftItem = player:getSecondaryHandItem()
@@ -46,21 +46,6 @@ local function sufficientLight(player)
 	return false --nothing let them read, so return false.
 end
 
-local passiveXPLevelThresholds = { 1500.0, 3000.0, 6000.0, 9000.0, 18000.0, 30000.0, 60000.0, 90000.0, 120000.0, 150000.0 }
-local xpLevelThresholds = { 75.0, 150.0, 300.0, 750.0, 1500.0, 3000.0, 4500.0, 6000.0, 7500.0, 9000.0 }
-
-local function getXPForLevel(level, passive)
-    passive = passive or false
-    if level ~= 10 then
-        if not passive then
-            return xpLevelThresholds[level]
-        else
-            return passiveXPLevelThresholds[level]
-        end
-    end
-    return 0
-end
-
 local function split(s, sep)
     if sep == nil then
         sep = "%s"
@@ -73,7 +58,7 @@ local function split(s, sep)
 end
 
 function ISReadABook:update()
-	print("USBXP: Enter Function")
+	--print("USBXP: Enter Function")
 	local player = getPlayer()
 	if SandboxVars.UdderlySkillbookXP.NeedLight and not sufficientLight(player) then
 		self.character:Say(getText("IGUI_PlayerText_TooDark"))
@@ -84,7 +69,7 @@ function ISReadABook:update()
 		self:forceStop()
 		return
 	else
-		print("USBXP: Not illiterate and has sufficient light, proceeding..")
+		--print("USBXP: Not illiterate and has sufficient light, proceeding..")
 		local multiplier = 1
 		
 		if player:isPlayerMoving() then
@@ -106,14 +91,14 @@ function ISReadABook:update()
 		local perk = ""
 		if skillBook then --If it's a skillbook, process the info about what skill it trains.
 			perk = skillBook.perk
-			print("USBXP: Is a skillbook for \""..tostring(perk).."\"")
+			--print("USBXP: Is a skillbook for \""..tostring(perk).."\"")
 			local tmpMultiplier = 0
 			for i,pair in ipairs(split(SandboxVars.UdderlySkillbookXP.SkillWhitelist or whitelistFallback, ";")) do
-			print("USBXP: Parsing pair from sandbox options \""..pair.."\"..")
+			--print("USBXP: Parsing pair from sandbox options \""..pair.."\"..")
 				local pairBits = split(pair, "=")
 				local skill = pairBits[1] or ""
 				tmpMultiplier = multiplier * tonumber(pairBits[2]) or 0
-				print("USBXP: Skill \""..skill.."\", Multiplier "..tmpMultiplier)
+				--print("USBXP: Skill \""..skill.."\", Multiplier "..tmpMultiplier)
 				if tostring(perk) == skill and tmpMultiplier > 0 then --if this is whitelisted
 					skillWhitelisted = true
 					multiplier = tmpMultiplier
@@ -121,19 +106,19 @@ function ISReadABook:update()
 				end
 			end
 		end
-		print("USBXP: Skill \""..tostring(perk).."\" Whitelisted: "..tostring(skillWhitelisted))
+		--print("USBXP: Skill \""..tostring(perk).."\" Whitelisted: "..tostring(skillWhitelisted))
 		
 		
 		if not skillWhitelisted then --Abort if not whitelisted for XP, we do this here and not earlier because we want to interrupt reading for walking or light level.
 		    return
 		end
 		
-		print("USBXP: Skill is whitelisted, proceeding..")
+		--print("USBXP: Skill is whitelisted, proceeding..")
 		local level = self.character:getPerkLevel(perk)
 		local maxLevelTrained = self.item:getMaxLevelTrained()
 		local minLevelTrained = maxLevelTrained - self.item:getNumLevelsTrained()
 		local nextLevel = level + 1
-		print("USBXP: Level "..level..", Max Trained: "..maxLevelTrained..", Min Trained: "..minLevelTrained..", Next Level "..nextLevel)
+		--print("USBXP: Level "..level..", Max Trained: "..maxLevelTrained..", Min Trained: "..minLevelTrained..", Next Level "..nextLevel)
 		if nextLevel > maxLevelTrained then --If they passed the tier, stop them..
 			local phrases = { "IGUI_PlayerText_KnowSkill", "IGUI_PlayerText_BookObsolete" }
 			self.character:Say(getText(phrases[ZombRand(2)]));
@@ -143,33 +128,32 @@ function ISReadABook:update()
 			self.character:Say(getText(phrases[ZombRand(2)]));
 			self:forceStop()
 		else --They are on the proper tier, continue..
-			print("USBXP: Correct tier to receive XP..")
+			--print("USBXP: Correct tier to receive XP..")
 			local passive = perk == Perks.Fitness or perk == Perks.Strength
-			local percentRead = self.item:getAlreadyReadPages() / self.item:getNumberOfPages()
+			local percentRead = 0.0 + self.item:getAlreadyReadPages() / self.item:getNumberOfPages()
 			if percentRead > 1 then
 				percentRead = 1
 			end
-			print("USBXP: Percent Read: "..(percentRead * 100).."%")
+			--print("USBXP: Percent Read: "..(percentRead * 100).."%")
 			local targetLevel = self.item:getLvlSkillTrained() + (self.item:getNumLevelsTrained() * multiplier) - 1
-			print("USBXP: Target Level "..targetLevel)
-			local targetXP = 0.0
-			for i=1,targetLevel do
-				targetXP = targetXP + getXPForLevel(i, passive)
-			end
-			print("USBXP: Full Target XP: "..targetXP)
+			--print("USBXP: Target Level "..targetLevel)
+			local targetXP = 0.0 + perk:getTotalXpForLevel(targetLevel)
+			--print("USBXP: Full Target XP: "..targetXP)
 			targetXP = targetXP * percentRead
-			print("USBXP: Target XP: "..targetXP)
+			--print("USBXP: Target XP: "..targetXP)
 			local currentXP = self.character:getXp():getXP(perk)
-			print("USBXP: Current XP: "..currentXP)
+			--print("USBXP: Current XP: "..currentXP)
 			local xpToAdd = math.ceil(targetXP - currentXP)
 			if percentRead == 1 then
 				xpToAdd = xpToAdd + 1
 			end
-			print("USBXP: XP To Add: "..xpToAdd)
-			self.character:getXp():AddXP(perk, xpToAdd);
+			if (xpToAdd > 0) then --If the user has already gotten XP in this skill it can end up past the target and thus negative, in which case we don't wanna add it.
+				--print("USBXP: XP To Add: "..xpToAdd)
+				self.character:getXp():AddXP(perk, xpToAdd);
+			end
 		end
 	end
-	print("USBXP: End Function")
+	--print("USBXP: End Function")
 end
 
 function ISReadABook:new(character, item, time)
